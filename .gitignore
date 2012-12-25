@@ -5,3 +5,6 @@ local_settings.py
 
 # vim swap files
 *.swp
+
+# virtualenv directory
+env/*
