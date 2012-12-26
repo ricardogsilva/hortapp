@@ -4,51 +4,74 @@
 '''
 A fabric fabfile to automate deployment tasks.
 '''
+
 import os
 from ConfigParser import SafeConfigParser
-from fabric.api import settings, sudo, local
+from fabric.api import lcd, settings, sudo, local, env
 
 def _install_apt_dependencies():
-    sudo('apt-get install python-dev libsqlite3-dev python-virtualenv')
+    '''
+    Install the needed apt dependencies on a local machine.
+    '''
 
-def _create_virtualenv(virtualenv_dir):
-    with settings(warn_only=True):
-        if local('test -d %s' % virtualenv_dir).failed:
-            local('virtualenv %s' % virtualenv_dir)
+    local('sudo apt-get install python-dev libsqlite3-dev python-pip fabric ' \
+         'python-virtualenv')
 
-def _install_pysqlite(python_interpreter):
+def _install_pip_requirements():
+    # virtualenv plus whatever else is in the requirements.txt file
+    pass
+
+def _install_pysqlite(root_dir, env_dir):
     '''
     Download, configure and install pysqlite.
 
     In order to use spatialite, the pysqlite module must have been compiled 
     allowing the loading of extensions, which is not the default. As such,
-    it is necessary to get the pysqlit source code and compile with the 
+    it is necessary to get the pysqlite source code and compile with the 
     required configuration.
     '''
-    _install_apt_dependencies()
+
     source_code = {
-        'download_dir' : 'tmp',
+        'download_dir' : os.path.join(root_dir, 'tmp'),
         'base_url' : 'http://pysqlite.googlecode.com/files',
-        'package_name' : 'pysqlite-2.6.3.tar.gz'
+        'package_name' : 'pysqlite-2.6.3',
+        'compression' : 'tar.gz',
     }
     local('mkdir -p %(download_dir)s' % source_code)
-    with cd('(download_dir)s' % source_code):
-        local('wget %(base_url)s/(package_name)s' % source_code)
-        local('tar -zxvf %(package_name)s' % source_code)
-        config_file = '(package_name)s/setup.cfg' % source_code 
+    with lcd(source_code['download_dir']):
+        local('wget %(base_url)s/%(package_name)s.%(compression)s' % \
+              source_code)
+        local('tar -zxvf %(package_name)s.%(compression)s' % source_code)
+        config_file = os.path.join(source_code['download_dir'],
+                                   source_code['package_name'],
+                                   'setup.cfg')
         config = SafeConfigParser()
         config.read(config_file)
         config.remove_option('build_ext', 'define')
         with open(config_file, 'w') as fh:
             config.write(fh)
-        local('%s setup.py install' % python_interpreter)
+    with lcd(os.path.join(source_code['download_dir'], 
+                          source_code['package_name'])):
+        local('%s setup.py install' % os.path.join(env_dir, 'bin', 'python'))
+    local('rm -rf %(download_dir)s' % source_code)
 
 def prepare_development():
+    '''
+    Prepare a local machine for development.
+
+    This task will setup a virtualenv and download any required packages and
+    python modules in order to work on the project's development.
+    '''
+
+    _install_apt_dependencies()
     root_dir = os.path.dirname(os.path.realpath(__file__))
-    env_dir = os.path.join(root_dir, 'env')
-    _create_virtualenv(env_dir)
-    interpreter = os.path.join(env_dir, 'bin', 'python')
-    _install_pysqlite(interpreter)
+    env_name = 'env'
+    virtualenv_dir = os.path.join(root_dir, env_name)
+    if not os.path.isdir(virtualenv_dir):
+        local('virtualenv %s' % env_name)
+        _install_pip_requirements()
+        _install_pysqlite(root_dir, virtualenv_dir)
 
 def clone_repo():
+    pass
     run('git clone https://github.com/ricardogsilva/hortapp.git')
