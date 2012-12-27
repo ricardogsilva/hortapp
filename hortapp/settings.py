@@ -121,7 +121,7 @@ INSTALLED_APPS = (
     # 'django.contrib.admindocs',
     'django.contrib.gis',
     'south',
-    #'horta',
+    'horta',
 )
 
 # A sample logging configuration. The only tangible logging
