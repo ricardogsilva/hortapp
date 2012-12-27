@@ -9,17 +9,13 @@ import os
 from ConfigParser import SafeConfigParser
 from fabric.api import lcd, settings, sudo, local, env
 
-def _install_apt_dependencies():
+def _install_apt_dependencies(where):
     '''
     Install the needed apt dependencies on a local machine.
     '''
 
-    local('sudo apt-get install python-dev libsqlite3-dev python-pip fabric ' \
-         'python-virtualenv')
-
-def _install_pip_requirements():
-    # virtualenv plus whatever else is in the requirements.txt file
-    pass
+    where('sudo apt-get install python-dev libsqlite3-dev python-pip fabric ' \
+         'python-virtualenv libspatialite3 spatialite-bin')
 
 def _install_pysqlite(root_dir, env_dir):
     '''
@@ -55,22 +51,25 @@ def _install_pysqlite(root_dir, env_dir):
         local('%s setup.py install' % os.path.join(env_dir, 'bin', 'python'))
     local('rm -rf %(download_dir)s' % source_code)
 
-def prepare_development():
+def prepare_env():
     '''
     Prepare a local machine for development.
 
-    This task will setup a virtualenv and download any required packages and
-    python modules in order to work on the project's development.
+    This task will create a virtualenv and download any required packages and
+    python modules that need compilation in order to work on the project's
+    development.
     '''
 
-    _install_apt_dependencies()
+    _install_apt_dependencies(local)
     root_dir = os.path.dirname(os.path.realpath(__file__))
     env_name = 'env'
     virtualenv_dir = os.path.join(root_dir, env_name)
     if not os.path.isdir(virtualenv_dir):
         local('virtualenv %s' % env_name)
-        _install_pip_requirements()
         _install_pysqlite(root_dir, virtualenv_dir)
+
+def install_extra_requirements(where=local):
+    where('pip install -r requirements.txt')
 
 def clone_repo():
     pass
