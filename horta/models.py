@@ -15,19 +15,55 @@ class PolygonRepresentation(GeoRepresentation):
     objects = models.GeoManager()
     geom = models.PolygonField()
 
+class Garden(Item):
+    item = models.OneToOneField(Item, primary_key=True, parent_link=True)
+    name = models.CharField(max_length=100)
+
+    def __unicode__(self):
+        return self.name
+
+class Parcel(Item):
+    item = models.OneToOneField(Item, primary_key=True, parent_link=True)
+    garden = models.ForeignKey(Garden)
+    name = models.CharField(max_length=100, default='Parcel')
+
+    def __unicode__(self):
+        return self.name
+
 class Zone(Item):
     item = models.OneToOneField(Item, primary_key=True, parent_link=True)
+    parcel = models.ForeignKey(Parcel)
     name = models.CharField(max_length=100, default='Zone')
 
-class Canteiro(Zone):
+    def __unicode__(self):
+        return self.name
+
+class Bed(Zone):
     zone = models.OneToOneField(Zone, primary_key=True, parent_link=True)
 
-class Especie(Item):
+class Species(Item):
     item = models.OneToOneField(Item, primary_key=True, parent_link=True)
     name = models.CharField(max_length=100, default='unspecified')
 
-class Plantacao(models.Model):
-    especie = models.ForeignKey(Especie)
+    class Meta:
+        verbose_name_plural = 'species'
+
+    def __unicode__(self):
+        return self.name
+
+class Plantation(models.Model):
+    species = models.ForeignKey(Species)
     zone = models.ForeignKey(Zone)
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
+
+    def __unicode__(self):
+        info = {'zone' : self.zone.name, 
+                'species' : self.species.name}
+        return '%(zone)s - %(species)s' % info
+
+class WorkSession(Item):
+    item = models.OneToOneField(Item, primary_key=True, parent_link=True)
+    garden = models.ForeignKey(Garden)
+    date_time = models.DateTimeField()
+    description = models.TextField()
