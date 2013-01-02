@@ -1,4 +1,5 @@
 from django.contrib.gis.db import models
+from django.contrib.auth.models import User
 
 class Item(models.Model):
     created = models.DateTimeField(auto_now_add=True)
@@ -44,6 +45,7 @@ class Bed(Zone):
 class Species(Item):
     item = models.OneToOneField(Item, primary_key=True, parent_link=True)
     name = models.CharField(max_length=100, default='unspecified')
+    description = models.TextField(null=True, blank=True)
 
     class Meta:
         verbose_name_plural = 'species'
@@ -64,6 +66,7 @@ class Plantation(models.Model):
 
 class WorkSession(Item):
     item = models.OneToOneField(Item, primary_key=True, parent_link=True)
-    garden = models.ForeignKey(Garden)
+    zones = models.ManyToManyField(Zone)
     date_time = models.DateTimeField()
     description = models.TextField()
+    users = models.ManyToManyField(User)
