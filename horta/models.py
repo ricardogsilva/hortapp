@@ -6,6 +6,13 @@ class Item(models.Model):
     modified = models.DateTimeField(auto_now=True)
     active = models.BooleanField(default=True)
 
+    def __unicode__(self):
+        try:
+            the_name = self.name
+        except AttributeError:
+            the_name = 'item'
+        return the_name
+
 class GeoRepresentation(models.Model):
     item = models.ForeignKey(Item)
 
@@ -70,3 +77,8 @@ class WorkSession(Item):
     date_time = models.DateTimeField()
     description = models.TextField()
     users = models.ManyToManyField(User)
+
+class BedPolygonRepresentation(PolygonRepresentation):
+    polygon_representation = models.OneToOneField(PolygonRepresentation)
+    bed = models.OneToOneField(Bed)
+

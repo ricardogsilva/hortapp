@@ -22,6 +22,9 @@ class PlantationAdmin(admin.ModelAdmin):
 class WorkSessionAdmin(admin.ModelAdmin):
     pass
 
+class BedPolygonRepresentationAdmin(admin.ModelAdmin):
+    pass
+
 admin.site.register(models.PolygonRepresentation, PolygonRepresentationAdmin)
 admin.site.register(models.Garden, GardenAdmin)
 admin.site.register(models.Parcel, ParcelAdmin)
@@ -29,3 +32,5 @@ admin.site.register(models.Bed, BedAdmin)
 admin.site.register(models.Species, SpeciesAdmin)
 admin.site.register(models.Plantation, PlantationAdmin)
 admin.site.register(models.WorkSession, WorkSessionAdmin)
+admin.site.register(models.BedPolygonRepresentation, 
+                    BedPolygonRepresentationAdmin)
