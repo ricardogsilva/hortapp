@@ -17,20 +17,6 @@ class Migration(SchemaMigration):
         ))
         db.send_create_signal('horta', ['Item'])
 
-        # Adding model 'GeoRepresentation'
-        db.create_table('horta_georepresentation', (
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('item', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['horta.Item'])),
-        ))
-        db.send_create_signal('horta', ['GeoRepresentation'])
-
-        # Adding model 'PolygonRepresentation'
-        db.create_table('horta_polygonrepresentation', (
-            ('geo_representation', self.gf('django.db.models.fields.related.OneToOneField')(to=orm['horta.GeoRepresentation'], unique=True, primary_key=True)),
-            ('geom', self.gf('django.contrib.gis.db.models.fields.PolygonField')()),
-        ))
-        db.send_create_signal('horta', ['PolygonRepresentation'])
-
         # Adding model 'Garden'
         db.create_table('horta_garden', (
             ('item', self.gf('django.db.models.fields.related.OneToOneField')(to=orm['horta.Item'], unique=True, primary_key=True)),
@@ -51,6 +37,7 @@ class Migration(SchemaMigration):
             ('item', self.gf('django.db.models.fields.related.OneToOneField')(to=orm['horta.Item'], unique=True, primary_key=True)),
             ('parcel', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['horta.Parcel'])),
             ('name', self.gf('django.db.models.fields.CharField')(default='Zone', max_length=100)),
+            ('geom', self.gf('django.contrib.gis.db.models.fields.PolygonField')()),
         ))
         db.send_create_signal('horta', ['Zone'])
 
@@ -106,12 +93,6 @@ class Migration(SchemaMigration):
     def backwards(self, orm):
         # Deleting model 'Item'
         db.delete_table('horta_item')
-
-        # Deleting model 'GeoRepresentation'
-        db.delete_table('horta_georepresentation')
-
-        # Deleting model 'PolygonRepresentation'
-        db.delete_table('horta_polygonrepresentation')
 
         # Deleting model 'Garden'
         db.delete_table('horta_garden')
@@ -187,11 +168,6 @@ class Migration(SchemaMigration):
             'item': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['horta.Item']", 'unique': 'True', 'primary_key': 'True'}),
             'name': ('django.db.models.fields.CharField', [], {'max_length': '100'})
         },
-        'horta.georepresentation': {
-            'Meta': {'object_name': 'GeoRepresentation'},
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'item': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['horta.Item']"})
-        },
         'horta.item': {
             'Meta': {'object_name': 'Item'},
             'active': ('django.db.models.fields.BooleanField', [], {'default': 'True'}),
@@ -213,11 +189,6 @@ class Migration(SchemaMigration):
             'species': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['horta.Species']"}),
             'zone': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['horta.Zone']"})
         },
-        'horta.polygonrepresentation': {
-            'Meta': {'object_name': 'PolygonRepresentation', '_ormbases': ['horta.GeoRepresentation']},
-            'geo_representation': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['horta.GeoRepresentation']", 'unique': 'True', 'primary_key': 'True'}),
-            'geom': ('django.contrib.gis.db.models.fields.PolygonField', [], {})
-        },
         'horta.species': {
             'Meta': {'object_name': 'Species', '_ormbases': ['horta.Item']},
             'description': ('django.db.models.fields.TextField', [], {'null': 'True', 'blank': 'True'}),
@@ -234,6 +205,7 @@ class Migration(SchemaMigration):
         },
         'horta.zone': {
             'Meta': {'object_name': 'Zone', '_ormbases': ['horta.Item']},
+            'geom': ('django.contrib.gis.db.models.fields.PolygonField', [], {}),
             'item': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['horta.Item']", 'unique': 'True', 'primary_key': 'True'}),
             'name': ('django.db.models.fields.CharField', [], {'default': "'Zone'", 'max_length': '100'}),
             'parcel': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['horta.Parcel']"})

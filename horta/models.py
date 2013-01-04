@@ -13,16 +13,6 @@ class Item(models.Model):
             the_name = 'item'
         return the_name
 
-class GeoRepresentation(models.Model):
-    item = models.ForeignKey(Item)
-
-class PolygonRepresentation(GeoRepresentation):
-    geo_representation = models.OneToOneField(GeoRepresentation,
-                                              primary_key=True,
-                                              parent_link=True)
-    objects = models.GeoManager()
-    geom = models.PolygonField()
-
 class Garden(Item):
     item = models.OneToOneField(Item, primary_key=True, parent_link=True)
     name = models.CharField(max_length=100)
@@ -39,9 +29,12 @@ class Parcel(Item):
         return self.name
 
 class Zone(Item):
+
     item = models.OneToOneField(Item, primary_key=True, parent_link=True)
     parcel = models.ForeignKey(Parcel)
     name = models.CharField(max_length=100, default='Zone')
+    geom = models.PolygonField()
+    objects = models.GeoManager()
 
     def __unicode__(self):
         return self.name
@@ -77,8 +70,3 @@ class WorkSession(Item):
     date_time = models.DateTimeField()
     description = models.TextField()
     users = models.ManyToManyField(User)
-
-class BedPolygonRepresentation(PolygonRepresentation):
-    polygon_representation = models.OneToOneField(PolygonRepresentation)
-    bed = models.OneToOneField(Bed)
-
