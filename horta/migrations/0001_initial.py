@@ -8,6 +8,13 @@ from django.db import models
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
+        # Adding model 'Media'
+        db.create_table('horta_media', (
+            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+            ('the_file', self.gf('django.db.models.fields.files.FileField')(max_length=100)),
+        ))
+        db.send_create_signal('horta', ['Media'])
+
         # Adding model 'Item'
         db.create_table('horta_item', (
             ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
@@ -17,10 +24,19 @@ class Migration(SchemaMigration):
         ))
         db.send_create_signal('horta', ['Item'])
 
+        # Adding M2M table for field files on 'Item'
+        db.create_table('horta_item_files', (
+            ('id', models.AutoField(verbose_name='ID', primary_key=True, auto_created=True)),
+            ('item', models.ForeignKey(orm['horta.item'], null=False)),
+            ('media', models.ForeignKey(orm['horta.media'], null=False))
+        ))
+        db.create_unique('horta_item_files', ['item_id', 'media_id'])
+
         # Adding model 'Garden'
         db.create_table('horta_garden', (
             ('item', self.gf('django.db.models.fields.related.OneToOneField')(to=orm['horta.Item'], unique=True, primary_key=True)),
             ('name', self.gf('django.db.models.fields.CharField')(max_length=100)),
+            ('geom', self.gf('django.contrib.gis.db.models.fields.MultiPolygonField')(null=True)),
         ))
         db.send_create_signal('horta', ['Garden'])
 
@@ -29,6 +45,7 @@ class Migration(SchemaMigration):
             ('item', self.gf('django.db.models.fields.related.OneToOneField')(to=orm['horta.Item'], unique=True, primary_key=True)),
             ('garden', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['horta.Garden'])),
             ('name', self.gf('django.db.models.fields.CharField')(default='Parcel', max_length=100)),
+            ('geom', self.gf('django.contrib.gis.db.models.fields.PolygonField')(null=True)),
         ))
         db.send_create_signal('horta', ['Parcel'])
 
@@ -57,11 +74,9 @@ class Migration(SchemaMigration):
 
         # Adding model 'Plantation'
         db.create_table('horta_plantation', (
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+            ('item_ptr', self.gf('django.db.models.fields.related.OneToOneField')(to=orm['horta.Item'], unique=True, primary_key=True)),
             ('species', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['horta.Species'])),
             ('zone', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['horta.Zone'])),
-            ('created', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
-            ('modified', self.gf('django.db.models.fields.DateTimeField')(auto_now=True, blank=True)),
         ))
         db.send_create_signal('horta', ['Plantation'])
 
@@ -91,8 +106,14 @@ class Migration(SchemaMigration):
 
 
     def backwards(self, orm):
+        # Deleting model 'Media'
+        db.delete_table('horta_media')
+
         # Deleting model 'Item'
         db.delete_table('horta_item')
+
+        # Removing M2M table for field files on 'Item'
+        db.delete_table('horta_item_files')
 
         # Deleting model 'Garden'
         db.delete_table('horta_garden')
@@ -165,6 +186,7 @@ class Migration(SchemaMigration):
         },
         'horta.garden': {
             'Meta': {'object_name': 'Garden', '_ormbases': ['horta.Item']},
+            'geom': ('django.contrib.gis.db.models.fields.MultiPolygonField', [], {'null': 'True'}),
             'item': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['horta.Item']", 'unique': 'True', 'primary_key': 'True'}),
             'name': ('django.db.models.fields.CharField', [], {'max_length': '100'})
         },
@@ -172,20 +194,25 @@ class Migration(SchemaMigration):
             'Meta': {'object_name': 'Item'},
             'active': ('django.db.models.fields.BooleanField', [], {'default': 'True'}),
             'created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
+            'files': ('django.db.models.fields.related.ManyToManyField', [], {'symmetrical': 'False', 'to': "orm['horta.Media']", 'null': 'True', 'blank': 'True'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'modified': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'})
+        },
+        'horta.media': {
+            'Meta': {'object_name': 'Media'},
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'the_file': ('django.db.models.fields.files.FileField', [], {'max_length': '100'})
         },
         'horta.parcel': {
             'Meta': {'object_name': 'Parcel', '_ormbases': ['horta.Item']},
             'garden': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['horta.Garden']"}),
+            'geom': ('django.contrib.gis.db.models.fields.PolygonField', [], {'null': 'True'}),
             'item': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['horta.Item']", 'unique': 'True', 'primary_key': 'True'}),
             'name': ('django.db.models.fields.CharField', [], {'default': "'Parcel'", 'max_length': '100'})
         },
         'horta.plantation': {
-            'Meta': {'object_name': 'Plantation'},
-            'created': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'modified': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'}),
+            'Meta': {'object_name': 'Plantation', '_ormbases': ['horta.Item']},
+            'item_ptr': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['horta.Item']", 'unique': 'True', 'primary_key': 'True'}),
             'species': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['horta.Species']"}),
             'zone': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['horta.Zone']"})
         },

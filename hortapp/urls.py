@@ -6,10 +6,14 @@ import horta.api
 admin.autodiscover()
 
 v1_api = Api(api_name='v1')
+v1_api.register(horta.api.MediaResource())
 v1_api.register(horta.api.GardenResource())
+v1_api.register(horta.api.ParcelResource())
 v1_api.register(horta.api.BedResource())
 v1_api.register(horta.api.SpeciesResource())
 v1_api.register(horta.api.PlantationResource())
+v1_api.register(horta.api.ZoneResource())
+v1_api.register(horta.api.WorkSessionResource())
 
 urlpatterns = patterns('',
     # Examples:
