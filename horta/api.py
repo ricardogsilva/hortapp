@@ -11,8 +11,10 @@ class MediaResource(ModelResource):
 class GardenResource(ModelResource):
     files = fields.ManyToManyField(MediaResource, 'files')
     class Meta:
+        always_return_data = True
         queryset = horta.models.Garden.objects.all()
         resource_name = 'garden'
+        fields = ['name']
 
 class ParcelResource(ModelResource):
     class Meta:
