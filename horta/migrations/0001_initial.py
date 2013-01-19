@@ -68,6 +68,7 @@ class Migration(SchemaMigration):
         db.create_table('horta_species', (
             ('item', self.gf('django.db.models.fields.related.OneToOneField')(to=orm['horta.Item'], unique=True, primary_key=True)),
             ('name', self.gf('django.db.models.fields.CharField')(default='unspecified', max_length=100)),
+            ('scientific_name', self.gf('django.db.models.fields.CharField')(default='unspecified', max_length=100)),
             ('description', self.gf('django.db.models.fields.TextField')(null=True, blank=True)),
         ))
         db.send_create_signal('horta', ['Species'])
@@ -80,11 +81,26 @@ class Migration(SchemaMigration):
         ))
         db.send_create_signal('horta', ['Plantation'])
 
-        # Adding model 'WorkSession'
-        db.create_table('horta_worksession', (
+        # Adding model 'Meeting'
+        db.create_table('horta_meeting', (
             ('item', self.gf('django.db.models.fields.related.OneToOneField')(to=orm['horta.Item'], unique=True, primary_key=True)),
             ('date_time', self.gf('django.db.models.fields.DateTimeField')()),
-            ('description', self.gf('django.db.models.fields.TextField')()),
+            ('title', self.gf('django.db.models.fields.CharField')(max_length=100)),
+            ('description', self.gf('django.db.models.fields.TextField')(null=True, blank=True)),
+        ))
+        db.send_create_signal('horta', ['Meeting'])
+
+        # Adding M2M table for field users on 'Meeting'
+        db.create_table('horta_meeting_users', (
+            ('id', models.AutoField(verbose_name='ID', primary_key=True, auto_created=True)),
+            ('meeting', models.ForeignKey(orm['horta.meeting'], null=False)),
+            ('user', models.ForeignKey(orm['auth.user'], null=False))
+        ))
+        db.create_unique('horta_meeting_users', ['meeting_id', 'user_id'])
+
+        # Adding model 'WorkSession'
+        db.create_table('horta_worksession', (
+            ('meeting_ptr', self.gf('django.db.models.fields.related.OneToOneField')(to=orm['horta.Meeting'], unique=True, primary_key=True)),
         ))
         db.send_create_signal('horta', ['WorkSession'])
 
@@ -96,13 +112,33 @@ class Migration(SchemaMigration):
         ))
         db.create_unique('horta_worksession_zones', ['worksession_id', 'zone_id'])
 
-        # Adding M2M table for field users on 'WorkSession'
-        db.create_table('horta_worksession_users', (
-            ('id', models.AutoField(verbose_name='ID', primary_key=True, auto_created=True)),
-            ('worksession', models.ForeignKey(orm['horta.worksession'], null=False)),
-            ('user', models.ForeignKey(orm['auth.user'], null=False))
+        # Adding model 'Report'
+        db.create_table('horta_report', (
+            ('item', self.gf('django.db.models.fields.related.OneToOneField')(to=orm['horta.Item'], unique=True, primary_key=True)),
+            ('author', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User'])),
+            ('worksession', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['horta.WorkSession'])),
+            ('description', self.gf('django.db.models.fields.TextField')(null=True, blank=True)),
         ))
-        db.create_unique('horta_worksession_users', ['worksession_id', 'user_id'])
+        db.send_create_signal('horta', ['Report'])
+
+        # Adding model 'Task'
+        db.create_table('horta_task', (
+            ('item', self.gf('django.db.models.fields.related.OneToOneField')(to=orm['horta.Item'], unique=True, primary_key=True)),
+            ('title', self.gf('django.db.models.fields.CharField')(max_length=100)),
+            ('author', self.gf('django.db.models.fields.related.ForeignKey')(related_name='task_author', to=orm['auth.User'])),
+            ('assigned_to', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User'])),
+            ('description', self.gf('django.db.models.fields.TextField')(null=True, blank=True)),
+            ('status', self.gf('django.db.models.fields.CharField')(max_length=20)),
+        ))
+        db.send_create_signal('horta', ['Task'])
+
+        # Adding M2M table for field zones on 'Task'
+        db.create_table('horta_task_zones', (
+            ('id', models.AutoField(verbose_name='ID', primary_key=True, auto_created=True)),
+            ('task', models.ForeignKey(orm['horta.task'], null=False)),
+            ('zone', models.ForeignKey(orm['horta.zone'], null=False))
+        ))
+        db.create_unique('horta_task_zones', ['task_id', 'zone_id'])
 
 
     def backwards(self, orm):
@@ -133,14 +169,26 @@ class Migration(SchemaMigration):
         # Deleting model 'Plantation'
         db.delete_table('horta_plantation')
 
+        # Deleting model 'Meeting'
+        db.delete_table('horta_meeting')
+
+        # Removing M2M table for field users on 'Meeting'
+        db.delete_table('horta_meeting_users')
+
         # Deleting model 'WorkSession'
         db.delete_table('horta_worksession')
 
         # Removing M2M table for field zones on 'WorkSession'
         db.delete_table('horta_worksession_zones')
 
-        # Removing M2M table for field users on 'WorkSession'
-        db.delete_table('horta_worksession_users')
+        # Deleting model 'Report'
+        db.delete_table('horta_report')
+
+        # Deleting model 'Task'
+        db.delete_table('horta_task')
+
+        # Removing M2M table for field zones on 'Task'
+        db.delete_table('horta_task_zones')
 
 
     models = {
@@ -203,6 +251,14 @@ class Migration(SchemaMigration):
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'the_file': ('django.db.models.fields.files.FileField', [], {'max_length': '100'})
         },
+        'horta.meeting': {
+            'Meta': {'object_name': 'Meeting', '_ormbases': ['horta.Item']},
+            'date_time': ('django.db.models.fields.DateTimeField', [], {}),
+            'description': ('django.db.models.fields.TextField', [], {'null': 'True', 'blank': 'True'}),
+            'item': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['horta.Item']", 'unique': 'True', 'primary_key': 'True'}),
+            'title': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
+            'users': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['auth.User']", 'symmetrical': 'False'})
+        },
         'horta.parcel': {
             'Meta': {'object_name': 'Parcel', '_ormbases': ['horta.Item']},
             'garden': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['horta.Garden']"}),
@@ -216,19 +272,34 @@ class Migration(SchemaMigration):
             'species': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['horta.Species']"}),
             'zone': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['horta.Zone']"})
         },
+        'horta.report': {
+            'Meta': {'object_name': 'Report', '_ormbases': ['horta.Item']},
+            'author': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['auth.User']"}),
+            'description': ('django.db.models.fields.TextField', [], {'null': 'True', 'blank': 'True'}),
+            'item': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['horta.Item']", 'unique': 'True', 'primary_key': 'True'}),
+            'worksession': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['horta.WorkSession']"})
+        },
         'horta.species': {
             'Meta': {'object_name': 'Species', '_ormbases': ['horta.Item']},
             'description': ('django.db.models.fields.TextField', [], {'null': 'True', 'blank': 'True'}),
             'item': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['horta.Item']", 'unique': 'True', 'primary_key': 'True'}),
-            'name': ('django.db.models.fields.CharField', [], {'default': "'unspecified'", 'max_length': '100'})
+            'name': ('django.db.models.fields.CharField', [], {'default': "'unspecified'", 'max_length': '100'}),
+            'scientific_name': ('django.db.models.fields.CharField', [], {'default': "'unspecified'", 'max_length': '100'})
+        },
+        'horta.task': {
+            'Meta': {'object_name': 'Task', '_ormbases': ['horta.Item']},
+            'assigned_to': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['auth.User']"}),
+            'author': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'task_author'", 'to': "orm['auth.User']"}),
+            'description': ('django.db.models.fields.TextField', [], {'null': 'True', 'blank': 'True'}),
+            'item': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['horta.Item']", 'unique': 'True', 'primary_key': 'True'}),
+            'status': ('django.db.models.fields.CharField', [], {'max_length': '20'}),
+            'title': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
+            'zones': ('django.db.models.fields.related.ManyToManyField', [], {'symmetrical': 'False', 'to': "orm['horta.Zone']", 'null': 'True', 'blank': 'True'})
         },
         'horta.worksession': {
-            'Meta': {'object_name': 'WorkSession', '_ormbases': ['horta.Item']},
-            'date_time': ('django.db.models.fields.DateTimeField', [], {}),
-            'description': ('django.db.models.fields.TextField', [], {}),
-            'item': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['horta.Item']", 'unique': 'True', 'primary_key': 'True'}),
-            'users': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['auth.User']", 'symmetrical': 'False'}),
-            'zones': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['horta.Zone']", 'symmetrical': 'False'})
+            'Meta': {'object_name': 'WorkSession', '_ormbases': ['horta.Meeting']},
+            'meeting_ptr': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['horta.Meeting']", 'unique': 'True', 'primary_key': 'True'}),
+            'zones': ('django.db.models.fields.related.ManyToManyField', [], {'symmetrical': 'False', 'to': "orm['horta.Zone']", 'null': 'True', 'blank': 'True'})
         },
         'horta.zone': {
             'Meta': {'object_name': 'Zone', '_ormbases': ['horta.Item']},

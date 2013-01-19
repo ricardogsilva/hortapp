@@ -1,6 +1,4 @@
 from django.contrib.auth.models import User
-#from django.db.models.signals import post_save
-#from django.dispatch import receiver
 from django.contrib.gis.db import models
 from django.contrib.gis.geos import MultiPolygon
 
@@ -74,6 +72,7 @@ class Bed(Zone):
 class Species(Item):
     item = models.OneToOneField(Item, primary_key=True, parent_link=True)
     name = models.CharField(max_length=100, default='unspecified')
+    scientific_name = models.CharField(max_length=100, null=True, blank=True)
     description = models.TextField(null=True, blank=True)
 
     class Meta:
@@ -91,9 +90,42 @@ class Plantation(Item):
                 'species' : self.species.name}
         return '%(zone)s - %(species)s' % info
 
-class WorkSession(Item):
+class Meeting(Item):
     item = models.OneToOneField(Item, primary_key=True, parent_link=True)
-    zones = models.ManyToManyField(Zone)
     date_time = models.DateTimeField()
-    description = models.TextField()
+    title = models.CharField(max_length=100)
+    description = models.TextField(null=True, blank=True)
     users = models.ManyToManyField(User)
+
+    def __unicode__(self):
+        return self.title
+
+class WorkSession(Meeting):
+    zones = models.ManyToManyField(Zone, null=True, blank=True)
+
+class Report(Item):
+    item = models.OneToOneField(Item, primary_key=True, parent_link=True)
+    title = models.CharField(max_length=100)
+    author = models.ForeignKey(User)
+    worksession = models.ForeignKey(WorkSession)
+    description = models.TextField(null=True, blank=True)
+
+    def __unicode__(self):
+        return self.name
+
+class Task(Item):
+    STATUS_CHOICES = (
+        ('not started', 'not started'),
+        ('in progress', 'in progress'),
+        ('finished', 'finished'),
+    )
+    item = models.OneToOneField(Item, primary_key=True, parent_link=True)
+    title = models.CharField(max_length=100)
+    zones = models.ManyToManyField(Zone, null=True, blank=True)
+    author = models.ForeignKey(User, related_name='task_author')
+    assigned_to = models.ForeignKey(User)
+    description = models.TextField(null=True, blank=True)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES)
+
+    def __unicode__(self):
+        return self.title
