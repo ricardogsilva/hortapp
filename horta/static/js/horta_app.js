@@ -1,16 +1,8 @@
-var HortaApp = Ember.Application.create({
-    ready : function(){
-        console.log('ric');
-        //var gardens = HortaApp.Garden.find();
-        //console.log(gardens);
-        //console.log('rac');
-    },
-});
+var HortaApp = Ember.Application.create();
 
 HortaApp.store = DS.Store.create({
     revision : 11,
-    adapter : DS.DjangoTastypieAdapter.extend({
-    }),
+    adapter : DS.DjangoTastypieAdapter.extend(),
 });
 
 /* Models */
@@ -31,18 +23,30 @@ HortaApp.AllGardensView = Ember.View.extend({
 });
 
 /* Controllers */
-HortaApp.ApplicationController = Ember.Controller.extend();
+HortaApp.ApplicationController = Ember.Controller.extend({
+    teste : 'Ricardo',
+    coisas : ['isto', 'aquilo', 'o outro', 'mais um'],
+});
 HortaApp.AllGardensController = Ember.ArrayController.extend();
 
 /* Routers */
 HortaApp.Router = Ember.Router.extend();
-HortaApp.Router.map(function(match){
-    match('/').to('allGardens');
+HortaApp.Router.map(function(){
+    this.resource('allGardens', {path : '/garden'}, function(){
+        this.route('new');
+    });
 });
 
 HortaApp.AllGardensRoute = Ember.Route.extend({
-    setupControllers : function(controller){
-        controller.set('gardens', HortaApp.Garden.find());
+    model : function(){
+        var coisas = HortaApp.Garden.find();
+        console.log(coisas);
+        return coisas;
+    },
+    setupController : function(controller, model){
+        console.log('aqui');
+        controller.set('content', model);
+        console.log('ali');
     },
 });
 

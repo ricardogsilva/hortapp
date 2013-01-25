@@ -22,13 +22,23 @@
 <body>
   <script type="text/x-handlebars" data-template-name="application">
     <h1>Gardens</h1>
+    <nav>
+    {{#linkTo 'index'}}Home{{/linkTo}}
+    {{#linkTo 'allGardens'}}Gardens{{/linkTo}}
+    </nav>
+    <p>{{teste}}</p>
+    <ul>
+    {{#each coisa in coisas}}
+    <li>{{coisa}}</li>
+    {{/each}}
+    </ul>
     {{outlet}}
   </script>
   <script type="text/x-handlebars" data-template-name="all-gardens">
-      {{#if gardens.isLoaded}}
+      {{#if model.isLoaded}}
       <ul>
-          {{#each garden in gardens}}
-          <li>{{garden.name}}</li>
+          {{#each model}}
+          <li>{{name}}</li>
           {{/each}}
       </ul>
       {{else}}
@@ -44,11 +54,10 @@
   <!-- The missing protocol means that it will match the current protocol, either http or https. If running locally, we use the local jQuery. -->
   <script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
   <script>window.jQuery || document.write('<script src="js/libs/jquery-1.7.2.min.js"><\/script>')</script>
-  <script src="static/js/libs/handlebars-1.0.0.beta.6.js"></script>
+  <script src="static/js/libs/handlebars.js"></script>
   <script src="static/js/libs/ember.js"></script>
   <script src="static/js/libs/ember-data.js"></script>
   <script src="static/js/libs/tastypie_adapter.js"></script>
-  <script src="static/js/libs/tastypie_serializer.js"></script>
   <script src="static/js/horta_app.js"></script>
 </body>
 </html>
