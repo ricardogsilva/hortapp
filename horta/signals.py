@@ -6,3 +6,12 @@ import models
 def update_parcel_geometry(sender, **kwargs):
     bed = kwargs.get('instance')
     bed.parcel.update_geometry()
+
+@receiver(post_save, sender=models.Parcel)
+def update_garden_geometry(sender, **kwargs):
+    parcel = kwargs.get('instance')
+    print('garden: %(garden_name)s - parcel: %(parcel_name)s' % {
+        'garden_name' : parcel.garden.name, 
+        'parcel_name' : parcel.name
+        })
+    parcel.garden.update_geometry()

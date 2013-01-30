@@ -21,7 +21,7 @@ class Item(models.Model):
 class Garden(Item):
     item = models.OneToOneField(Item, primary_key=True, parent_link=True)
     name = models.CharField(max_length=100)
-    geom = models.MultiPolygonField(editable=False, null=True)
+    geom = models.PointField(editable=False, null=True)
     objects = models.GeoManager()
 
     def __unicode__(self):
@@ -32,8 +32,11 @@ class Garden(Item):
         Automatically update geometry based on the geometries of own Parcels.
         '''
 
-        self.geom = MultiPolygon([z.geom for z in self.parcel_set.all()])
-        self.save()
+        mp = MultiPolygon([p.geom for p in self.parcel_set.all() if \
+                p.geom is not None])
+        if not mp.empty:
+            self.geom = mp.centroid
+            self.save()
 
 class Parcel(Item):
     item = models.OneToOneField(Item, primary_key=True, parent_link=True)
@@ -51,8 +54,9 @@ class Parcel(Item):
         '''
 
         mp = MultiPolygon([z.geom for z in self.zone_set.all()])
-        self.geom = mp.convex_hull
-        self.save()
+        if not mp.empty:
+            self.geom = mp.convex_hull
+            self.save()
 
 class Zone(Item):
 

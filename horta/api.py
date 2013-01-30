@@ -17,6 +17,9 @@ class GardenResource(ModelResource):
         always_return_data = True
         queryset = horta.models.Garden.objects.all()
         resource_name = 'garden'
+        filtering = {
+            'name' : constants.ALL,
+        }
 
 class ParcelResource(ModelResource):
     garden = fields.ForeignKey(GardenResource, 'garden')

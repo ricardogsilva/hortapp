@@ -36,7 +36,7 @@ class Migration(SchemaMigration):
         db.create_table('horta_garden', (
             ('item', self.gf('django.db.models.fields.related.OneToOneField')(to=orm['horta.Item'], unique=True, primary_key=True)),
             ('name', self.gf('django.db.models.fields.CharField')(max_length=100)),
-            ('geom', self.gf('django.contrib.gis.db.models.fields.MultiPolygonField')(null=True)),
+            ('geom', self.gf('django.contrib.gis.db.models.fields.PointField')(null=True)),
         ))
         db.send_create_signal('horta', ['Garden'])
 
@@ -68,7 +68,7 @@ class Migration(SchemaMigration):
         db.create_table('horta_species', (
             ('item', self.gf('django.db.models.fields.related.OneToOneField')(to=orm['horta.Item'], unique=True, primary_key=True)),
             ('name', self.gf('django.db.models.fields.CharField')(default='unspecified', max_length=100)),
-            ('scientific_name', self.gf('django.db.models.fields.CharField')(default='unspecified', max_length=100)),
+            ('scientific_name', self.gf('django.db.models.fields.CharField')(max_length=100, null=True, blank=True)),
             ('description', self.gf('django.db.models.fields.TextField')(null=True, blank=True)),
         ))
         db.send_create_signal('horta', ['Species'])
@@ -115,6 +115,7 @@ class Migration(SchemaMigration):
         # Adding model 'Report'
         db.create_table('horta_report', (
             ('item', self.gf('django.db.models.fields.related.OneToOneField')(to=orm['horta.Item'], unique=True, primary_key=True)),
+            ('title', self.gf('django.db.models.fields.CharField')(max_length=100)),
             ('author', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User'])),
             ('worksession', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['horta.WorkSession'])),
             ('description', self.gf('django.db.models.fields.TextField')(null=True, blank=True)),
@@ -234,7 +235,7 @@ class Migration(SchemaMigration):
         },
         'horta.garden': {
             'Meta': {'object_name': 'Garden', '_ormbases': ['horta.Item']},
-            'geom': ('django.contrib.gis.db.models.fields.MultiPolygonField', [], {'null': 'True'}),
+            'geom': ('django.contrib.gis.db.models.fields.PointField', [], {'null': 'True'}),
             'item': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['horta.Item']", 'unique': 'True', 'primary_key': 'True'}),
             'name': ('django.db.models.fields.CharField', [], {'max_length': '100'})
         },
@@ -277,6 +278,7 @@ class Migration(SchemaMigration):
             'author': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['auth.User']"}),
             'description': ('django.db.models.fields.TextField', [], {'null': 'True', 'blank': 'True'}),
             'item': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['horta.Item']", 'unique': 'True', 'primary_key': 'True'}),
+            'title': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
             'worksession': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['horta.WorkSession']"})
         },
         'horta.species': {
@@ -284,7 +286,7 @@ class Migration(SchemaMigration):
             'description': ('django.db.models.fields.TextField', [], {'null': 'True', 'blank': 'True'}),
             'item': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['horta.Item']", 'unique': 'True', 'primary_key': 'True'}),
             'name': ('django.db.models.fields.CharField', [], {'default': "'unspecified'", 'max_length': '100'}),
-            'scientific_name': ('django.db.models.fields.CharField', [], {'default': "'unspecified'", 'max_length': '100'})
+            'scientific_name': ('django.db.models.fields.CharField', [], {'max_length': '100', 'null': 'True', 'blank': 'True'})
         },
         'horta.task': {
             'Meta': {'object_name': 'Task', '_ormbases': ['horta.Item']},

@@ -11,6 +11,13 @@ HortaApp.Garden = DS.Model.extend({
     active : DS.attr('boolean'),
     created : DS.attr('date'),
     modified : DS.attr('date'),
+    geom : DS.attr('string'),
+    parcels : DS.hasMany('HortaApp.Parcel'),
+});
+
+HortaApp.Parcel = DS.Model.extend({
+    name : DS.attr('string'),
+    garden : DS.belongsTo('HortaApp.Garden'),
 });
 
 /* Views */
@@ -33,7 +40,17 @@ HortaApp.AllGardensController = Ember.ArrayController.extend({
         return this.get('length');
     }.property('@each'),
 });
-HortaApp.GardenController = Ember.ObjectController.extend();
+HortaApp.GardenController = Ember.ObjectController.extend({
+    wktParser : new OpenLayers.Format.WKT(),
+    point : function(){
+        var wkt = this.get('geom');
+        var pt;
+        if(wkt !== null){
+            pt = this.wktParser.read(wkt);
+        };
+        return pt
+    }.property('@each'),
+});
 
 /* Routers */
 HortaApp.Router = Ember.Router.extend();
