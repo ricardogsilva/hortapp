@@ -26,30 +26,24 @@
     {{#linkTo 'index'}}Home{{/linkTo}}
     {{#linkTo 'allGardens'}}Gardens{{/linkTo}}
     </nav>
-    <p>{{teste}}</p>
-    <ul>
-    {{#each coisa in coisas}}
-    <li>{{coisa}}</li>
-    {{/each}}
-    </ul>
     {{outlet}}
   </script>
   <script type="text/x-handlebars" data-template-name="all-gardens">
       {{#if model.isLoaded}}
       <ul>
-          {{#each model}}
-          <li>{{name}}</li>
+          {{#each garden in model}}
+          <li>{{#linkTo garden garden}}{{garden.name}}{{/linkTo}}</li>
           {{/each}}
       </ul>
+      <p>Total gardens: {{totalGardens}}</p>
       {{else}}
       <p class='loading'>Loading gardens...</p>
       {{/if}}
   </script>
-  <script type="text/x-handlebars" data-template-name="a-garden">
-      <div>
-          <a {{action showAllGardens}}>All Gardens</a>
-      </div>
-      {{name}}
+  <script type="text/x-handlebars" data-template-name="garden">
+      <h1>{{name}}</h1>
+      <p>Created: {{created}}</p>
+      <p>active: {{active}}</p>
   </script>
   <!-- The missing protocol means that it will match the current protocol, either http or https. If running locally, we use the local jQuery. -->
   <script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
