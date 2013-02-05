@@ -25,6 +25,7 @@
     <nav>
     {{#linkTo 'index'}}Home{{/linkTo}}
     {{#linkTo 'allGardens'}}Gardens{{/linkTo}}
+    {{#linkTo 'allSpecies'}}Species{{/linkTo}}
     </nav>
     {{outlet}}
   </script>
@@ -55,6 +56,29 @@
       </p>
       {{else}}
       <p class='loading'>Loading garden...</p>
+      {{/if}}
+  </script>
+  <script type="text/x-handlebars" data-template-name="all-species">
+      {{#if model.isLoaded}}
+      <ul>
+          {{#each species in model}}
+          <li>{{#linkTo species species}}{{species.name}}{{/linkTo}}</li>
+          {{/each}}
+      </ul>
+      <p>Total species: {{totalSpecies}}</p>
+      {{else}}
+      <p class='loading'>Loading species...</p>
+      {{/if}}
+  </script>
+  <script type="text/x-handlebars" data-template-name="species">
+      {{#if model.isLoaded}}
+      <h1>{{name}}</h1>
+      <p>Created: {{created}}</p>
+      <p>active: {{active}}</p>
+      <p>scientific name: {{scientific_name}}</p>
+      <p>description: {{description}}</p>
+      {{else}}
+      <p class='loading'>Loading species...</p>
       {{/if}}
   </script>
   <!-- The missing protocol means that it will match the current protocol, either http or https. If running locally, we use the local jQuery. -->

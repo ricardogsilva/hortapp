@@ -6,6 +6,19 @@ HortaApp.store = DS.Store.create({
 });
 
 /* Models */
+HortaApp.User = DS.Model.extend({
+    name : DS.attr('string'),
+});
+
+HortaApp.Species = DS.Model.extend({
+    name : DS.attr('string'),
+    active : DS.attr('boolean'),
+    created : DS.attr('date'),
+    modified : DS.attr('date'),
+    scientific_name : DS.attr('string'),
+    description : DS.attr('string'),
+});
+
 HortaApp.Garden = DS.Model.extend({
     name : DS.attr('string'),
     active : DS.attr('boolean'),
@@ -28,15 +41,25 @@ HortaApp.ApplicationView = Ember.View.extend({
 HortaApp.AllGardensView = Ember.View.extend({
     templateName : 'all-gardens',
 });
+HortaApp.AllSpeciesView = Ember.View.extend({
+    templateName : 'all-species',
+});
 HortaApp.GardenView = Ember.View.extend({
     templateName : 'garden',
+});
+HortaApp.SpeciesView = Ember.View.extend({
+    templateName : 'species',
 });
 
 /* Controllers */
 HortaApp.ApplicationController = Ember.Controller.extend();
 HortaApp.AllGardensController = Ember.ArrayController.extend({
     totalGardens : function(){
-        console.log(this);
+        return this.get('length');
+    }.property('@each'),
+});
+HortaApp.AllSpeciesController = Ember.ArrayController.extend({
+    totalSpecies : function(){
         return this.get('length');
     }.property('@each'),
 });
@@ -57,6 +80,8 @@ HortaApp.Router = Ember.Router.extend();
 HortaApp.Router.map(function(){
     this.resource('allGardens', {path : '/garden'});
     this.resource('garden', {path : '/garden/:garden_id'});
+    this.resource('allSpecies', {path : '/species'});
+    this.resource('species', {path : '/species/:species_id'});
 });
 
 HortaApp.AllGardensRoute = Ember.Route.extend({
@@ -67,9 +92,25 @@ HortaApp.AllGardensRoute = Ember.Route.extend({
         controller.set('content', model);
     },
 });
+HortaApp.AllSpeciesRoute = Ember.Route.extend({
+    model : function(){
+        return HortaApp.Species.find();
+    },
+    setupController : function(controller, model){
+        controller.set('content', model);
+    },
+});
 HortaApp.GardenRoute = Ember.Route.extend({
     model : function(params){
         return HortaApp.Garden.find(params.garden_id);
+    },
+    setupController : function(controller, model){
+        controller.set('content', model);
+    },
+});
+HortaApp.SpeciesRoute = Ember.Route.extend({
+    model : function(params){
+        return HortaApp.Species.find(params.species_id);
     },
     setupController : function(controller, model){
         controller.set('content', model);

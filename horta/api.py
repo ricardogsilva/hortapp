@@ -6,6 +6,7 @@ import horta.models
 
 class MediaResource(ModelResource):
     class Meta:
+        always_return_data = True
         queryset = horta.models.Media.objects.all()
 
 class GardenResource(ModelResource):
@@ -24,11 +25,13 @@ class GardenResource(ModelResource):
 class ParcelResource(ModelResource):
     garden = fields.ForeignKey(GardenResource, 'garden')
     class Meta:
+        always_return_data = True
         queryset = horta.models.Parcel.objects.all()
         resource_name = 'parcel'
 
 class ZoneResource(ModelResource):
     class Meta:
+        always_return_data = True
         queryset = horta.models.Zone.objects.all()
         resource_name = 'zone'
         filtering = {
@@ -37,6 +40,7 @@ class ZoneResource(ModelResource):
 
 class BedResource(gis_ModelResource):
     class Meta:
+        always_return_data = True
         queryset = horta.models.Bed.objects.all()
         resource_name = 'bed'
         filtering = {
@@ -45,6 +49,7 @@ class BedResource(gis_ModelResource):
 
 class SpeciesResource(ModelResource):
     class Meta:
+        always_return_data = True
         queryset = horta.models.Species.objects.all()
         resource_name = 'species'
         filtering = {
@@ -56,6 +61,7 @@ class PlantationResource(ModelResource):
     species = fields.ForeignKey(SpeciesResource, 'species')
 
     class Meta:
+        always_return_data = True
         queryset = horta.models.Plantation.objects.all()
         resource_name = 'plantation'
         filtering = {
@@ -66,5 +72,6 @@ class PlantationResource(ModelResource):
 class WorkSessionResource(ModelResource):
     zones = fields.ManyToManyField(ZoneResource, 'zones')
     class Meta:
+        always_return_data = True
         queryset = horta.models.WorkSession.objects.all()
         resource_name = 'worksession'
