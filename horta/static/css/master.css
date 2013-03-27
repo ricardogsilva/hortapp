@@ -1,0 +1,32 @@
+body {
+    background-color : #eff8ef;
+    color : #252b25;
+    font-family: 'Open Sans', sans-serif;
+}
+
+h1 {
+    font-family: 'Gloria Hallelujah', sans-serif;
+}
+
+#mainArea {
+    margin : 0 auto;
+    width : 770px;
+}
+
+#gardensArea {
+    background-color : #9cf79c;
+    color : #174c17;
+    border : 2px solid #4af74a;
+    padding : 15px;
+}
+
+.createdDate {
+    text-align: right;
+    padding-right: 20px;
+    color: #333333;
+}
+
+.separator {
+    border: #000 1px dotted;
+    border-style: none none dashed;
+}

@@ -13,82 +13,28 @@
 
   <link rel="shortcut icon" href="/favicon.ico">
   <link rel="apple-touch-icon" href="/apple-touch-icon.png">
-  <!--<link rel="stylesheet" href="css/style.css?v=2">-->
+  <link rel="stylesheet" href="static/css/master.css" type="text/css" charset="utf-8">
+  <link href='http://fonts.googleapis.com/css?family=Open+Sans|Gloria+Hallelujah' rel='stylesheet' type='text/css'>
 
   <!--[if lt IE 9]>
   <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
   <![endif]-->
+  <!-- The missing protocol means that it will match the current protocol, either http or https. If running locally, we use the local jQuery. -->
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js" type="text/javascript" charset="utf-8"></script>
+  <script>window.jQuery || document.write('<script src="js/libs/jquery-1.7.2.min.js"><\/script>')</script>
+  <script src="static/js/libs/OpenLayers.js" type="text/javascript" charset="utf-8"></script>
+  <script src="static/js/libs/handlebars.js" type="text/javascript" charset="utf-8"></script>
+  <script src="static/js/libs/ember.js" type="text/javascript" charset="utf-8"></script>
+  <script src="static/js/libs/ember-data.js" type="text/javascript" charset="utf-8"></script>
+  <script src="static/js/libs/tastypie_adapter.js" type="text/javascript" charset="utf-8"></script>
+  <script src="static/js/app/app.js" type="text/javascript" charset="utf-8"></script>
+  <script src="static/js/app/models.js" type="text/javascript" charset="utf-8"></script>
+  <script src="static/js/app/templates.js" type="text/javascript" charset="utf-8"></script>
+  <script src="static/js/app/views.js" type="text/javascript" charset="utf-8"></script>
+  <script src="static/js/app/controllers.js" type="text/javascript" charset="utf-8"></script>
+  <script src="static/js/app/router.js" type="text/javascript" charset="utf-8"></script>
+  <script src="static/js/app/main.js" type="text/javascript" charset="utf-8"></script>
 </head>
 <body>
-  <script type="text/x-handlebars" data-template-name="application">
-    <h1>Gardens</h1>
-    <nav>
-    {{#linkTo 'index'}}Home{{/linkTo}}
-    {{#linkTo 'allGardens'}}Gardens{{/linkTo}}
-    {{#linkTo 'allSpecies'}}Species{{/linkTo}}
-    </nav>
-    {{outlet}}
-  </script>
-  <script type="text/x-handlebars" data-template-name="all-gardens">
-      {{#if model.isLoaded}}
-      <ul>
-          {{#each garden in model}}
-          <li>{{#linkTo garden garden}}{{garden.name}}{{/linkTo}}</li>
-          {{/each}}
-      </ul>
-      <p>Total gardens: {{totalGardens}}</p>
-      {{else}}
-      <p class='loading'>Loading gardens...</p>
-      {{/if}}
-  </script>
-  <script type="text/x-handlebars" data-template-name="garden">
-      {{#if model.isLoaded}}
-      <h1>{{name}}</h1>
-      <p>Created: {{created}}</p>
-      <p>active: {{active}}</p>
-      <p>point: {{point.geometry.x}}, {{point.geometry.y}}</p>
-      <p>parcels:
-        <ul>
-            {{#each model.parcels}}
-            <li>{{name}}</li>
-            {{/each}}
-        </ul>
-      </p>
-      {{else}}
-      <p class='loading'>Loading garden...</p>
-      {{/if}}
-  </script>
-  <script type="text/x-handlebars" data-template-name="all-species">
-      {{#if model.isLoaded}}
-      <ul>
-          {{#each species in model}}
-          <li>{{#linkTo species species}}{{species.name}}{{/linkTo}}</li>
-          {{/each}}
-      </ul>
-      <p>Total species: {{totalSpecies}}</p>
-      {{else}}
-      <p class='loading'>Loading species...</p>
-      {{/if}}
-  </script>
-  <script type="text/x-handlebars" data-template-name="species">
-      {{#if model.isLoaded}}
-      <h1>{{name}}</h1>
-      <p>Created: {{created}}</p>
-      <p>active: {{active}}</p>
-      <p>scientific name: {{scientific_name}}</p>
-      <p>description: {{description}}</p>
-      {{else}}
-      <p class='loading'>Loading species...</p>
-      {{/if}}
-  </script>
-  <!-- The missing protocol means that it will match the current protocol, either http or https. If running locally, we use the local jQuery. -->
-  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
-  <script>window.jQuery || document.write('<script src="js/libs/jquery-1.7.2.min.js"><\/script>')</script>
-  <script src="static/js/libs/OpenLayers.js"></script>
-  <script src="static/js/libs/handlebars.js"></script>
-  <script src="static/js/libs/ember.js"></script>
-  <script src="static/js/libs/ember-data.js"></script>
-  <script src="static/js/libs/tastypie_adapter.js"></script>
-  <script src="static/js/horta_app.js"></script>
 </body>
 </html>

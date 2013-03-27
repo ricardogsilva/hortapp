@@ -115,7 +115,7 @@ class Report(Item):
     description = models.TextField(null=True, blank=True)
 
     def __unicode__(self):
-        return self.name
+        return self.title
 
 class Task(Item):
     STATUS_CHOICES = (

@@ -28,6 +28,9 @@ class ParcelResource(ModelResource):
         always_return_data = True
         queryset = horta.models.Parcel.objects.all()
         resource_name = 'parcel'
+        filtering = {
+            'garden' : constants.ALL_WITH_RELATIONS,
+        }
 
 class ZoneResource(ModelResource):
     class Meta:

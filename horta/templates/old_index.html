@@ -1,0 +1,116 @@
+<!doctype html>
+<!--[if lt IE 7 ]> <html lang="en" class="ie6"> <![endif]--> <!--[if IE 7 ]>    <html lang="en" class="ie7"> <![endif]--> <!--[if IE 8 ]>    <html lang="en" class="ie8"> <![endif]--> <!--[if IE 9 ]>    <html lang="en" class="ie9"> <![endif]-->
+<!--[if (gt IE 9)|!(IE)]><!--> <html lang="en"> <!--<![endif]-->
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+
+  <title></title>
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <link rel="shortcut icon" href="/favicon.ico">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <!--<link rel="stylesheet" href="css/style.css?v=2">-->
+
+  <!--[if lt IE 9]>
+  <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+</head>
+<body>
+  <script type="text/x-handlebars" data-template-name="application">
+    <h1>Gardens</h1>
+    <nav>
+    {{#linkTo 'index'}}Home{{/linkTo}}
+    {{#linkTo 'allGardens'}}Gardens{{/linkTo}}
+    {{#linkTo 'allSpecies'}}Species{{/linkTo}}
+    </nav>
+    {{outlet}}
+  </script>
+  <script type="text/x-handlebars" data-template-name="all-gardens">
+      {{#if model.isLoaded}}
+      <ul>
+          {{#each the_garden in model}}
+          {{#if the_garden.active}}
+          <li>{{#linkTo garden.index the_garden}}{{the_garden.name}}{{/linkTo}}
+          ({{the_garden.point.geometry.x}}, {{the_garden.point.geometry.y}})</li>
+          {{else}}
+          <li>{{#linkTo garden.index the_garden}}{{the_garden.name}}{{/linkTo}}</li>
+          {{/if}}
+          {{/each}}
+      </ul>
+      <p>Total gardens: {{totalGardens}}</p>
+      {{else}}
+      <p class='loading'>Loading gardens...</p>
+      {{/if}}
+      {{outlet}}
+  </script>
+  <script type="text/x-handlebars" data-template-name="garden">
+      {{#if model.isLoaded}}
+      <h1>{{name}}</h1>
+      <p>Created: {{created}}</p>
+      <p>active: {{active}}</p>
+      <p>point: {{point.geometry.x}}, {{point.geometry.y}}</p>
+      <p>{{#linkTo allPlantations}}plantations{{/linkTo}}</p>
+      {{else}}
+      <p class='loading'>Loading garden...</p>
+      {{/if}}
+      {{outlet}}
+  </script>
+  <script type="text/x-handlebars" data-template-name='garden-plantations'>
+      {{#if model.isLoaded}}
+      <ul>
+          {{#each the_plantation in model}}
+          <li>{{#linkTo plantation the_plantation}}{{the_plantation.species.name}}{{/linkTo}}</li>
+          {{/each}}
+      </ul>
+      {{else}}
+      <p class='loading'>Loading plantations...</p>
+      {{/if}}
+      {{outlet}}
+  </script>
+  <script type="text/x-handlebars" data-template-name="plantation">
+      {{#if model.isLoaded}}
+      <h1>{{name}}</h1>
+      <p>Created: {{created}}</p>
+      <p>active: {{active}}</p>
+      {{else}}
+      <p class='loading'>Loading plantation...</p>
+      {{/if}}
+  </script>
+  <script type="text/x-handlebars" data-template-name="all-species">
+      {{#if model.isLoaded}}
+      <ul>
+          {{#each species in model}}
+          <li>{{#linkTo species species}}{{species.name}}{{/linkTo}}</li>
+          {{/each}}
+      </ul>
+      <p>Total species: {{totalSpecies}}</p>
+      {{else}}
+      <p class='loading'>Loading species...</p>
+      {{/if}}
+  </script>
+  <script type="text/x-handlebars" data-template-name="species">
+      {{#if model.isLoaded}}
+      <h1>{{name}}</h1>
+      <p>Created: {{created}}</p>
+      <p>active: {{active}}</p>
+      <p>scientific name: {{scientific_name}}</p>
+      <p>description: {{description}}</p>
+      {{else}}
+      <p class='loading'>Loading species...</p>
+      {{/if}}
+  </script>
+  <!-- The missing protocol means that it will match the current protocol, either http or https. If running locally, we use the local jQuery. -->
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+  <script>window.jQuery || document.write('<script src="js/libs/jquery-1.7.2.min.js"><\/script>')</script>
+  <script src="static/js/libs/OpenLayers.js"></script>
+  <script src="static/js/libs/handlebars.js"></script>
+  <script src="static/js/libs/ember.js"></script>
+  <script src="static/js/libs/ember-data.js"></script>
+  <script src="static/js/libs/tastypie_adapter.js"></script>
+  <script src="static/js/horta_app.js"></script>
+</body>
+</html>
